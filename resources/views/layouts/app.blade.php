@@ -55,7 +55,7 @@
                         <ul class="flex space-x-8 font-medium text-gray-700">
                             <li><a href="{{ route('landing') }}" class="hover:text-primary transition">Home</a></li>
                             <li><a href="{{ route('shop.index') }}" class="hover:text-primary transition">Shop</a></li>
-                            <li><a href="cart.php" class="hover:text-primary transition">Cart</a></li>
+                            <li><a href="{{ route('cart.index') }}" class="hover:text-primary transition">Cart</a></li>
                             <li><a href="wishlist.php" class="hover:text-primary transition">Wishlist</a></li>
                             <li><a href="contact.php" class="hover:text-primary transition">Contact</a></li>
                         </ul>
@@ -210,8 +210,8 @@
                     <img src="assets/images/logo-w.png" alt="Logo" class="mb-6 max-w-[200px]" />
                     <ul class="space-y-2 text-sm">
                         <li>ABC, Address Here, Country</li>
-                        <li>Call Us: <a href="#" class="hover:text-primary transition">+000 000 0000</a></li>
-                        <li>Email: <a href="#" class="hover:text-primary transition">info@surfsidemedia.in</a>
+                        <li>Call Us: <a href="#" class="hover:text-primary transition">+698 581 853</a></li>
+                        <li>Email: <a href="#" class="hover:text-primary transition">souagoussama11@gmail.com</a>
                         </li>
                     </ul>
                     <div class="flex space-x-4 mt-6">

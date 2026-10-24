@@ -98,7 +98,7 @@
 
 
                     {{-- Orders --}}
-                    <a href="#"
+                    <a href="{{ route('admin.orders') }}"
                         class="nav-link flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition hover:bg-white/5 hover:text-white">
                         <i class="fa-solid fa-cart-shopping w-5 text-center"></i>
                         <span>Orders</span>

@@ -1,202 +1,386 @@
+
 <x-app-layout>
-    <div class="relative bg-sky-700 text-white h-64 flex items-center justify-center bg-cover bg-center"
-        style="background-image: url('assets/images/page-banner.jpg');">
-        <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+    {{-- Page Banner --}}
+    <div
+        class="relative flex h-64 items-center justify-center bg-sky-700 bg-cover bg-center text-white"
+        style="background-image: url('{{ asset('assets/images/page-banner.jpg') }}');"
+    >
+        <div class="absolute inset-0 bg-black/40"></div>
+
         <div class="relative z-10 text-center">
-            <h2 class="text-4xl font-bold mb-2">Cart</h2>
+            <h2 class="mb-2 text-4xl font-bold">Cart</h2>
+
             <ul class="flex justify-center space-x-2 text-sm">
-                <li><a href="{{ route('landing') }}" class="hover:text-primary">Home</a></li>
+                <li>
+                    <a href="{{ route('landing') }}" class="hover:text-primary">
+                        Home
+                    </a>
+                </li>
                 <li>/</li>
                 <li class="text-primary">Cart</li>
             </ul>
         </div>
     </div>
 
+    {{-- Cart Content --}}
     <section class="py-16">
         <div class="container mx-auto px-4">
-            @if (Cart::instance('cart')->content()->isEmpty())
 
-                <div id="empty-cart" class="text-center py-10 ">
-                    <h2 class="text-2xl font-bold mb-4">There are no more items in your cart</h2>
-                    <img src="assets/images/cart.png" alt="Empty Cart" class="mx-auto mb-6 max-w-xs">
-                    <p class="text-gray-500 mb-6">No item found in your cart</p>
-                    <a href="{{ route('shop.index') }}"
-                        class="inline-block bg-primary text-white px-6 py-2 rounded hover:bg-blue-600 transition">Continue
-                        Browsing</a>
+            {{-- Flash Messages --}}
+            @if (session('success'))
+                <div class="mb-6 rounded-lg bg-green-100 p-4 text-green-700">
+                    {{ session('success') }}
                 </div>
+            @endif
+
+            @if (session('error'))
+                <div class="mb-6 rounded-lg bg-red-100 p-4 text-red-700">
+                    {{ session('error') }}
+                </div>
+            @endif
+
+            @if ($errors->any())
+                <div class="mb-6 rounded-lg bg-red-100 p-4 text-red-700">
+                    <ul class="list-inside list-disc">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            @php
+                $cartItems = Cart::instance('cart')->content();
+
+                // Calculate subtotal from individual cart items.
+                $cartSubtotal = (float) $cartItems->sum('subtotal');
+
+                $coupon = session('coupon');
+                $discountData = session('discount', []);
+                $discountAmount = $coupon
+                    ? (float) ($discountData['discount'] ?? 0)
+                    : 0;
+
+                $discountAmount = min(max(0, $discountAmount), $cartSubtotal);
+                $finalTotal = max(0, $cartSubtotal - $discountAmount);
+            @endphp
+
+            @if ($cartItems->isEmpty())
+
+                {{-- Empty Cart --}}
+                <div id="empty-cart" class="py-10 text-center">
+                    <h2 class="mb-4 text-2xl font-bold">
+                        Your cart is empty
+                    </h2>
+
+                    <img
+                        src="{{ asset('assets/images/cart.png') }}"
+                        alt="Empty cart"
+                        class="mx-auto mb-6 max-w-xs"
+                    >
+
+                    <p class="mb-6 text-gray-500">
+                        No items found in your cart.
+                    </p>
+
+                    <a
+                        href="{{ route('shop.index') }}"
+                        class="inline-block rounded bg-primary px-6 py-2 text-white transition hover:bg-blue-600"
+                    >
+                        Continue Shopping
+                    </a>
+                </div>
+
             @else
+
                 <div id="cart-content" class="cart-wrapper">
-                    <div class="overflow-x-auto mb-8">
+
+                    {{-- Products Table --}}
+                    <div class="mb-8 overflow-x-auto">
                         <table class="w-full cart-table">
-                            <thead class="bg-gray-100 border-b">
+                            <thead class="border-b bg-gray-100">
                                 <tr>
-                                    <th class="py-4 px-4 text-left font-bold text-gray-700">Image</th>
-                                    <th class="py-4 px-4 text-left font-bold text-gray-700">Product Information</th>
-                                    <th class="py-4 px-4 text-left font-bold text-gray-700">Quantity</th>
-                                    <th class="py-4 px-4 text-left font-bold text-gray-700">Total Price</th>
-                                    <th class="py-4 px-4 text-left font-bold text-gray-700">Action</th>
+                                    <th class="px-4 py-4 text-left font-bold text-gray-700">
+                                        Image
+                                    </th>
+                                    <th class="px-4 py-4 text-left font-bold text-gray-700">
+                                        Product Information
+                                    </th>
+                                    <th class="px-4 py-4 text-left font-bold text-gray-700">
+                                        Quantity
+                                    </th>
+                                    <th class="px-4 py-4 text-left font-bold text-gray-700">
+                                        Total Price
+                                    </th>
+                                    <th class="px-4 py-4 text-left font-bold text-gray-700">
+                                        Action
+                                    </th>
                                 </tr>
                             </thead>
+
                             <tbody class="divide-y divide-gray-200">
-                                @foreach (Cart::instance('cart')->content() as $item)
+                                @foreach ($cartItems as $item)
                                     @php
                                         $product = Cart::instance('cart')->model($item->rowId);
                                     @endphp
-                                    <tr>
-                                        <td class="py-4 px-4 product-thumb" data-label="Image">
-                                            <a href="details.php<img src="{{ asset('storage/' . $product->image) }}"
-                                                alt="{{ $product->name }}" </a></a>
-                                        </td>
-                                        <td class="py-4 px-4" data-label="Product">
-                                            <h6 class="font-bold text-gray-800"><a
-                                                    href="{{ route('shop.show', ['slug' => $product->slug]) }}"
-                                                    class="hover:text-primary">{{ $item->name }}</a></h6>
-                                            <div class="text-sm mt-1">
-                                                <span
-                                                    class="text-primary font-bold">{{ number_format($item->price, 2) }}DA</span>
-                                            </div>
 
+                                    <tr>
+                                        {{-- Product Image --}}
+                                        <td class="px-4 py-4">
+                                            <a href="{{ route('shop.show', ['slug' => $product->slug]) }}">
+                                                <img
+                                                    src="{{ $product->image ? asset('storage/' . $product->image) : asset('assets/images/cart.png') }}"
+                                                    alt="{{ $item->name }}"
+                                                    class="h-20 w-20 rounded object-contain"
+                                                >
+                                            </a>
                                         </td>
-                                        <td class="py-4 px-4" data-label="Quantity">
-                                            <form action="{{ route('cart.update') }}" method="POST"
-                                                class="inline-block">
+
+                                        {{-- Product Information --}}
+                                        <td class="px-4 py-4">
+                                            <h6 class="font-bold text-gray-800">
+                                                <a
+                                                    href="{{ route('shop.show', ['slug' => $product->slug]) }}"
+                                                    class="hover:text-primary"
+                                                >
+                                                    {{ $item->name }}
+                                                </a>
+                                            </h6>
+
+                                            <div class="mt-1 text-sm">
+                                                <span class="font-bold text-primary">
+                                                    {{ number_format((float) $item->price, 2) }} DA
+                                                </span>
+                                            </div>
+                                        </td>
+
+                                        {{-- Quantity --}}
+                                        <td class="px-4 py-4">
+                                            <form
+                                                action="{{ route('cart.update') }}"
+                                                method="POST"
+                                                class="inline-block"
+                                            >
                                                 @csrf
                                                 @method('PUT')
-                                                <input type="hidden" name="rowId" value="{{ $item->rowId }}">
-                                                <div class="flex border rounded w-max">
-                                                    <button type="submit" class="px-3 py-1 hover:bg-gray-100"
-                                                        onclick="updateCartQty(this, -1)">-</button>
-                                                    <input type="number" name="quantity" value="{{ $item->qty }}"
-                                                        class="w-12 text-center focus:outline-none" readonly>
-                                                    <button type="submit" class="px-3 py-1 hover:bg-gray-100"
-                                                        onclick="updateCartQty(this, 1)">+</button>
+
+                                                <input
+                                                    type="hidden"
+                                                    name="rowId"
+                                                    value="{{ $item->rowId }}"
+                                                >
+
+                                                <div class="flex w-max rounded border">
+                                                    <button
+                                                        type="button"
+                                                        onclick="changeQuantity(this, -1)"
+                                                        class="px-3 py-1 hover:bg-gray-100"
+                                                        aria-label="Decrease quantity"
+                                                    >
+                                                        &minus;
+                                                    </button>
+
+                                                    <input
+                                                        type="number"
+                                                        name="quantity"
+                                                        value="{{ $item->qty }}"
+                                                        min="1"
+                                                        readonly
+                                                        class="w-12 text-center focus:outline-none"
+                                                    >
+
+                                                    <button
+                                                        type="button"
+                                                        onclick="changeQuantity(this, 1)"
+                                                        class="px-3 py-1 hover:bg-gray-100"
+                                                        aria-label="Increase quantity"
+                                                    >
+                                                        +
+                                                    </button>
                                                 </div>
                                             </form>
                                         </td>
-                                        <td class="py-4 px-4 font-bold text-primary" data-label="Total">
-                                            {{ number_format($item->subtotal, 2) }}DA</td>
-                                        <td class="py-4 px-4" data-label="Action">
-                                            <form action="{{ route('cart.remove', $item->rowId) }}" method="POST"
-                                                class="inline-block">
+
+                                        {{-- Item Subtotal --}}
+                                        <td class="px-4 py-4 font-bold text-primary">
+                                            {{ number_format((float) $item->subtotal, 2) }} DA
+                                        </td>
+
+                                        {{-- Remove Item --}}
+                                        <td class="px-4 py-4">
+                                            <form
+                                                action="{{ route('cart.remove', $item->rowId) }}"
+                                                method="POST"
+                                            >
                                                 @csrf
                                                 @method('DELETE')
 
-                                                <button type="submit""
-                                                    class="text-gray-400 hover:text-red-500 transition"><i
-                                                        class="fa-solid fa-trash-can text-xl"></i></button>
+                                                <button
+                                                    type="submit"
+                                                    class="text-gray-400 transition hover:text-red-500"
+                                                    aria-label="Remove {{ $item->name }}"
+                                                    onclick="return confirm('Remove this product from your cart?')"
+                                                >
+                                                    <i class="fa-solid fa-trash-can text-xl"></i>
+                                                </button>
                                             </form>
                                         </td>
                                     </tr>
                                 @endforeach
-
                             </tbody>
                         </table>
                     </div>
 
-                    <div class="flex flex-col sm:flex-row justify-between items-center mb-12 gap-4">
-                        <a href="{{ route('shop.index') }}"
-                            class="bg-sky-800 text-white px-6 py-3 rounded hover:bg-primary transition w-full sm:w-auto text-center">Continue
-                            Shopping</a>
-                        <div class="flex gap-4 w-full sm:w-auto">
-                            <form action="{{ route('cart.clear') }}" method="POST" class="w-full">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit"" href="{{ route('cart.clear') }}"
-                                    class="border border-gray-800 text-gray-800 px-6 py-3 rounded hover:bg-sky-800 hover:text-white transition w-full sm:w-auto text-center">Update
-                                    Cart</button>
-                            </form>
-                        </div>
+                    {{-- Cart Actions --}}
+                    <div class="mb-12 flex flex-col items-center justify-between gap-4 sm:flex-row">
+                        <a
+                            href="{{ route('shop.index') }}"
+                            class="w-full rounded bg-sky-800 px-6 py-3 text-center text-white transition hover:bg-primary sm:w-auto"
+                        >
+                            Continue Shopping
+                        </a>
+
+                        <form
+                            action="{{ route('cart.clear') }}"
+                            method="POST"
+                            class="w-full sm:w-auto"
+                        >
+                            @csrf
+                            @method('DELETE')
+
+                            <button
+                                type="submit"
+                                onclick="return confirm('Are you sure you want to clear your cart?')"
+                                class="w-full rounded border border-gray-800 px-6 py-3 text-center text-gray-800 transition hover:bg-sky-800 hover:text-white sm:w-auto"
+                            >
+                                Clear Cart
+                            </button>
+                        </form>
                     </div>
 
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <div class="bg-gray-50 p-6 rounded border">
-                            <h4 class="font-bold text-lg mb-2">Calculate Shipping</h4>
-                            <p class="text-sm text-gray-500 mb-4">Estimate your shipping fee *</p>
-                            <form class="space-y-4">
-                                <select
-                                    class="w-full border p-3 rounded bg-white focus:outline-none focus:border-primary text-gray-500">
-                                    <option>Select a country...</option>
-                                    <option>Bangladesh</option>
-                                    <option>Canada</option>
-                                    <option>USA</option>
-                                    <option>UK</option>
-                                </select>
-                                <select
-                                    class="w-full border p-3 rounded bg-white focus:outline-none focus:border-primary text-gray-500">
-                                    <option>Select a state/region...</option>
-                                    <option>Dhaka</option>
-                                    <option>New York</option>
-                                    <option>London</option>
-                                </select>
-                                <input type="text" placeholder="Postcode/Zip"
-                                    class="w-full border p-3 rounded focus:outline-none focus:border-primary">
+                    {{-- Coupon and Totals --}}
+                    <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
+
+                        {{-- Coupon Form --}}
+                        <div class="rounded border bg-gray-50 p-6 lg:col-span-2">
+                            <h4 class="mb-2 text-lg font-bold">
+                                Coupon Code
+                            </h4>
+
+                            <p class="mb-4 text-sm text-gray-500">
+                                Enter your coupon code if you have one.
+                            </p>
+
+                            <form
+                                class="space-y-4"
+                                action="{{ route('cart.coupon.apply') }}"
+                                method="POST"
+                            >
+                                @csrf
+
+                                <input
+                                    type="text"
+                                    name="coupon_code"
+                                    placeholder="Enter coupon code..."
+                                    value="{{ old('coupon_code', $coupon['code'] ?? '') }}"
+                                    required
+                                    class="w-full rounded border p-3 uppercase focus:border-primary focus:outline-none"
+                                >
+
                                 <button
-                                    class="bg-sky-800 text-white px-6 py-3 rounded hover:bg-primary transition w-full">Update
-                                    Totals</button>
+                                    type="submit"
+                                    class="w-full rounded bg-sky-800 px-6 py-3 text-white transition hover:bg-primary"
+                                >
+                                    Apply Coupon
+                                </button>
                             </form>
+
+                            @if ($coupon)
+                                <form
+                                    action="{{ route('cart.coupon.remove') }}"
+                                    method="POST"
+                                    class="mt-3"
+                                >
+                                    @csrf
+                                    @method('DELETE')
+
+                                    <button
+                                        type="submit"
+                                        class="text-sm font-medium text-red-600 hover:text-red-800"
+                                    >
+                                        Remove Coupon
+                                    </button>
+                                </form>
+                            @endif
                         </div>
 
-                        <div class="bg-gray-50 p-6 rounded border">
-                            <h4 class="font-bold text-lg mb-2">Coupon Code</h4>
-                            <p class="text-sm text-gray-500 mb-4">Enter your coupon code if you have one.</p>
-                            <form class="space-y-4">
-                                <input type="text" placeholder="Enter coupon code..."
-                                    class="w-full border p-3 rounded focus:outline-none focus:border-primary">
-                                <button
-                                    class="bg-sky-800 text-white px-6 py-3 rounded hover:bg-primary transition w-full">Apply
-                                    Coupon</button>
-                            </form>
-                        </div>
+                        {{-- Cart Totals --}}
+                        <div class="rounded border bg-gray-50 p-6">
+                            <h4 class="mb-4 text-lg font-bold">
+                                Cart Totals
+                            </h4>
 
-                        <div class="bg-gray-50 p-6 rounded border">
-                            <h4 class="font-bold text-lg mb-4">Cart Totals</h4>
-                            <div class="space-y-4 mb-6">
+                            <div class="mb-6 space-y-4">
+
                                 <div class="flex justify-between border-b pb-2">
                                     <span class="font-medium">Subtotal</span>
-                                    <span
-                                        class="font-bold">{{ number_format(Cart::instance('cart')->subtotal(), 2) }}DA</span>
+
+                                    <span class="font-bold">
+                                        {{ number_format($cartSubtotal, 2) }} DA
+                                    </span>
                                 </div>
-                                <div class="flex justify-between items-start border-b pb-2">
-                                    <span class="font-medium pt-1">Shipping</span>
-                                    <div class="text-right text-sm space-y-1">
-                                        <label class="flex items-center justify-end cursor-pointer">
-                                            <input type="radio" name="shipping" checked class="mr-2"> Flat Rate
-                                        </label>
-                                        <label class="flex items-center justify-end cursor-pointer">
-                                            <input type="radio" name="shipping" class="mr-2"> Free Shipping
-                                        </label>
-                                        <label class="flex items-center justify-end cursor-pointer">
-                                            <input type="radio" name="shipping" class="mr-2"> Local Pickup
-                                        </label>
+
+                                @if ($coupon)
+                                    <div class="flex justify-between border-b pb-2 text-green-700">
+                                        <span class="font-medium">
+                                            Discount
+                                            ({{ $coupon['code'] }})
+                                        </span>
+
+                                        <span class="font-bold">
+                                            -{{ number_format($discountAmount, 2) }} DA
+                                        </span>
                                     </div>
-                                </div>
+                                @endif
+
                                 <div class="flex justify-between pt-2">
-                                    <span class="font-bold text-lg">Total</span>
-                                    <span
-                                        class="font-bold text-lg text-primary">{{ number_format(Cart::instance('cart')->total(), 2) }}DA</span>
+                                    <span class="text-lg font-bold">Total</span>
+
+                                    <span class="text-lg font-bold text-primary">
+                                        {{ number_format($finalTotal, 2) }} DA
+                                    </span>
                                 </div>
                             </div>
-                            <a href="checkout.php"
-                                class="block bg-sky-800 text-white text-center px-6 py-3 rounded hover:bg-primary transition w-full">Proceed
-                                To Checkout</a>
+
+                            <a
+                                href="{{ route('checkout') }}"
+                                class="block w-full rounded bg-sky-800 px-6 py-3 text-center text-white transition hover:bg-primary"
+                            >
+                                Proceed To Checkout
+                            </a>
                         </div>
                     </div>
 
                 </div>
+
             @endif
         </div>
     </section>
+
     <script>
-        function updateCartQty(button, change) {
+        function changeQuantity(button, change) {
             const form = button.closest('form');
-            const quantityInput = form.querySelector('input[name="quantity"]');
-            let currentQty = parseInt(quantityInput.value);
-            if (isNaN(currentQty)) currentQty = 0;
-            const newQty = Math.max(0, currentQty + change);
-            quantityInput.value = newQty;
+            const input = form.querySelector('input[name="quantity"]');
 
+            const currentQuantity = parseInt(input.value, 10) || 1;
+            const newQuantity = Math.max(1, currentQuantity + change);
 
+            if (newQuantity === currentQuantity) {
+                return;
+            }
+
+            input.value = newQuantity;
+            form.requestSubmit();
         }
     </script>
-
 </x-app-layout>

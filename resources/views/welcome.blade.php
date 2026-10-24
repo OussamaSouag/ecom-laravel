@@ -506,7 +506,7 @@
                         <div class="hidden lg:flex justify-center">
 
                             <img
-                                src="{{ asset('storage/images/slider/slider-item-1.png') }}"
+                                src="{{ asset('storage/images/slider-item-1.webp') }}"
                                 alt="OussMarket products"
                                 class="max-h-[430px] w-auto object-contain"
                             >
@@ -549,7 +549,7 @@
                         <div class="hidden lg:flex justify-center">
 
                             <img
-                                src="{{ asset('storage/images/slider/slider-item-2.png') }}"
+                                src="{{ asset('storage/images/slider-item-2.webp') }}"
                                 alt="OussMarket products"
                                 class="max-h-[430px] w-auto object-contain"
                             >
@@ -659,7 +659,7 @@
                 <div class="rounded-2xl border border-slate-100 bg-white p-7 text-center transition hover:-translate-y-1 hover:shadow-lg">
 
                     <img
-                        src="{{ asset('storage/images/icon/icon-1.png') }}"
+                        src="{{ asset('storage/images/free-shipping.webp') }}"
                         alt="Fast Delivery"
                         class="mx-auto mb-5 h-16"
                     >
@@ -677,7 +677,7 @@
                 <div class="rounded-2xl border border-slate-100 bg-white p-7 text-center transition hover:-translate-y-1 hover:shadow-lg">
 
                     <img
-                        src="{{ asset('storage/images/icon/icon-2.png') }}"
+                        src="{{ asset('storage/images/secure-checkout.webp') }}"
                         alt="Safe Payment"
                         class="mx-auto mb-5 h-16"
                     >
@@ -695,7 +695,7 @@
                 <div class="rounded-2xl border border-slate-100 bg-white p-7 text-center transition hover:-translate-y-1 hover:shadow-lg">
 
                     <img
-                        src="{{ asset('storage/images/icon/icon-3.png') }}"
+                        src="{{ asset('storage/images/ships-same-day.webp') }}"
                         alt="Online Support"
                         class="mx-auto mb-5 h-16"
                     >
@@ -945,7 +945,7 @@
                 <div class="group relative overflow-hidden rounded-2xl">
 
                     <img
-                        src="{{ asset('storage/images/banner/banner-05.jpg') }}"
+                        src="{{ asset('storage/images/hight.webp') }}"
                         alt="New Products"
                         class="h-[300px] w-full object-cover transition duration-500 group-hover:scale-105"
                     >
@@ -976,7 +976,7 @@
                 <div class="group relative overflow-hidden rounded-2xl">
 
                     <img
-                        src="{{ asset('storage/images/banner/banner-06.jpg') }}"
+                        src="{{ asset('storage/images/best.webp') }}"
                         alt="Best Products"
                         class="h-[300px] w-full object-cover transition duration-500 group-hover:scale-105"
                     >
@@ -1086,7 +1086,7 @@
                 <div class="flex justify-center">
 
                     <img
-                        src="{{ asset('storage/images/countdown.png') }}"
+                        src="{{ asset('storage/images/countdown.webp') }}"
                         alt="Special Offer"
                         class="max-h-[420px] w-full max-w-md object-contain"
                     >
@@ -1239,7 +1239,7 @@
                                 href="tel:+213000000000"
                                 class="transition hover:text-blue-400"
                             >
-                                +213 000 000 000
+                                +213 698 581 853
                             </a>
                         </li>
 
@@ -1249,7 +1249,7 @@
                                 href="mailto:contact@oussmarket.com"
                                 class="transition hover:text-blue-400"
                             >
-                                contact@oussmarket.com
+                                souagoussama11@gmailcom
                             </a>
                         </li>
 

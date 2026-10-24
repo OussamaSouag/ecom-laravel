@@ -1,29 +1,29 @@
 <x-app-layout>
     <style>
         .costume-range-slider::-webkit-slider-thumb {
-    pointer-events: auto;
-    appearance: none;
-    width: 16px;
-    height: 16px;
-    background: #0284c7;
-    border-radius: 50%;
-    cursor: pointer;
-}
+            pointer-events: auto;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #0284c7;
+            border-radius: 50%;
+            cursor: pointer;
+        }
 
-.costume-range-slider::-moz-range-thumb {
-    pointer-events: auto;
-    width: 16px;
-    height: 16px;
-    background: #0284c7;
-    border-radius: 50%;
-    border: none;
-    cursor: pointer;
-}
+        .costume-range-slider::-moz-range-thumb {
+            pointer-events: auto;
+            width: 16px;
+            height: 16px;
+            background: #0284c7;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+        }
     </style>
 
     {{-- Page Banner --}}
     <div class="relative bg-sky-700 text-white h-64 flex items-center justify-center bg-cover bg-center"
-        style="background-image: url('{{ asset('assets/images/page-banner.jpg') }}');">
+        style="background-image: url('{{ asset('assets/images/banner-01.webp') }}');">
         <div class="absolute inset-0 bg-black bg-opacity-40"></div>
 
         <div class="relative z-10 text-center">
@@ -58,12 +58,13 @@
                 {{-- SIDEBAR --}}
                 {{-- ========================= --}}
                 <aside class="w-full lg:w-1/4 order-2 lg:order-1 space-y-8">
-                  @if ( request()->anyFilled(['search','brand','category','min_price','max_price','sort_by','per_page']))
-                  <div class="flex items-center space-x-2"> Filter Applied: 
-                  <a href="{{ route('shop.index') }}" class="text-sm text-red-500 hover:text-primary">
-                  <span class="text-sm text-red-600">Clear All Filters</span><i class="fa-solid fa-xmark" ></i></a> 
-                  </div>
-                  @endif  
+                    @if (request()->anyFilled(['search', 'brand', 'category', 'min_price', 'max_price', 'sort_by', 'per_page']))
+                        <div class="flex items-center space-x-2"> Filter Applied:
+                            <a href="{{ route('shop.index') }}" class="text-sm text-red-500 hover:text-primary">
+                                <span class="text-sm text-red-600">Clear All Filters</span><i
+                                    class="fa-solid fa-xmark"></i></a>
+                        </div>
+                    @endif
 
                     {{-- Search --}}
                     <div class="bg-gray-50 p-6 rounded-lg border">
@@ -203,111 +204,6 @@
                             </div>
                         </div>
                     </div>
-
-
-
-                    {{-- Color Filter --}}
-                    <div class="bg-gray-50 p-6 rounded-lg border">
-
-                        <h4 class="font-bold text-lg mb-4">
-                            Filter By Color
-                        </h4>
-
-                        <ul class="space-y-3">
-
-                            <li class="flex items-center">
-
-                                <input type="checkbox" id="c1" class="hidden peer">
-
-                                <label for="c1"
-                                    class="flex items-center cursor-pointer hover:text-primary peer-checked:text-primary group">
-                                    <span
-                                        class="w-4 h-4 rounded-full bg-blue-500 mr-3 border border-gray-200 group-hover:shadow-md"></span>
-                                    Blue
-                                </label>
-
-                            </li>
-
-
-                            <li class="flex items-center">
-
-                                <input type="checkbox" id="c2" class="hidden peer">
-
-                                <label for="c2"
-                                    class="flex items-center cursor-pointer hover:text-primary peer-checked:text-primary group">
-                                    <span
-                                        class="w-4 h-4 rounded-full bg-green-500 mr-3 border border-gray-200 group-hover:shadow-md"></span>
-                                    Green
-                                </label>
-
-                            </li>
-
-
-                            <li class="flex items-center">
-
-                                <input type="checkbox" id="c3" class="hidden peer">
-
-                                <label for="c3"
-                                    class="flex items-center cursor-pointer hover:text-primary peer-checked:text-primary group">
-                                    <span
-                                        class="w-4 h-4 rounded-full bg-gray-500 mr-3 border border-gray-200 group-hover:shadow-md"></span>
-                                    Gray
-                                </label>
-
-                            </li>
-
-
-                            <li class="flex items-center">
-
-                                <input type="checkbox" id="c4" class="hidden peer">
-
-                                <label for="c4"
-                                    class="flex items-center cursor-pointer hover:text-primary peer-checked:text-primary group">
-                                    <span
-                                        class="w-4 h-4 rounded-full bg-black mr-3 border border-gray-200 group-hover:shadow-md"></span>
-                                    Black
-                                </label>
-
-                            </li>
-
-                        </ul>
-
-                    </div>
-
-
-                    {{-- Tags --}}
-                    <div class="bg-gray-50 p-6 rounded-lg border">
-
-                        <h4 class="font-bold text-lg mb-4">
-                            Tags
-                        </h4>
-
-                        <div class="flex flex-wrap gap-2">
-
-                            <a href="#"
-                                class="px-3 py-1 bg-white border rounded text-sm hover:bg-primary hover:text-white transition">
-                                Clothing
-                            </a>
-
-                            <a href="#"
-                                class="px-3 py-1 bg-white border rounded text-sm hover:bg-primary hover:text-white transition">
-                                Furniture
-                            </a>
-
-                            <a href="#"
-                                class="px-3 py-1 bg-white border rounded text-sm hover:bg-primary hover:text-white transition">
-                                Lights
-                            </a>
-
-                            <a href="#"
-                                class="px-3 py-1 bg-white border rounded text-sm hover:bg-primary hover:text-white transition">
-                                Modern
-                            </a>
-
-                        </div>
-
-                    </div>
-
                 </aside>
 
 

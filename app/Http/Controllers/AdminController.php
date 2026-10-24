@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Order;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -141,28 +142,30 @@ class AdminController extends Controller
     }
     public function products(Request $request)
     {
-        $sort_by = request()->input('sort_by','created_at');
-        $sort_order = request()->input('sort_order','desc');
-        $categories=Category::select('id','name')->orderBy('name')->get();
-        $brands=Brand::select('id','name')->orderBy('name')->get();
+        $sort_by = request()->input('sort_by', 'created_at');
+        $sort_order = request()->input('sort_order', 'desc');
+        $categories = Category::select('id', 'name')->orderBy('name')->get();
+        $brands = Brand::select('id', 'name')->orderBy('name')->get();
         $products = Product::with('category', 'brand')->orderBy('created_at', 'ASC')->paginate(10);
-         $query = Product::query('category','brand');
+        $query = Product::query('category', 'brand');
         if ($request->filled('category')) {
-            $query->where('category_id', $request->category) ;
-        }         $products = $query->get();
+            $query->where('category_id', $request->category);
+        }
+        $products = $query->get();
         if ($request->filled('brand')) {
-            $query->where('brand_id', $request->brand) ;
-        }         $products = $query->get();
+            $query->where('brand_id', $request->brand);
+        }
+        $products = $query->get();
         if ($request->filled('search')) {
-            $query->where('name', 'like', '%'.$request->search.'%')->orWhere('SKU','like','%'.$request->search.'%');
+            $query->where('name', 'like', '%' . $request->search . '%')->orWhere('SKU', 'like', '%' . $request->search . '%');
         }
         $products = $query->orderBy($sort_by, $sort_order)->paginate(10)->withQueryString();
 
 
         $products = $query->get();
-        return view('admin.products', compact('products','categories','brands'));
+        return view('admin.products', compact('products', 'categories', 'brands'));
     }
-    public function productsAdd()   
+    public function productsAdd()
     {
         $categories = Category::select('id', 'name')->orderBy('name')->get();
         $brands = Brand::select('id', 'name')->orderBy('name')->get();
@@ -280,27 +283,72 @@ class AdminController extends Controller
             ->route('admin.products')
             ->with('success', 'Product updated successfully');
     }
-    public function productsdestroy($id){
+    public function productsdestroy($id)
+    {
         $product = Product::findOrFail($id);
         $product->delete();
 
-         return redirect()
+        return redirect()
             ->route('admin.products')
             ->with('success', 'Product deleted successfully');
-
-
     }
     public function productsBulkDestroy(Request $request)
-{
-    $request->validate([
-        'ids' => 'required|array|min:1',
-        'ids.*' => 'integer|exists:products,id',
-    ]);
+    {
+        $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'integer|exists:products,id',
+        ]);
 
-    Product::whereIn('id', $request->ids)->delete();
+        Product::whereIn('id', $request->ids)->delete();
 
-    return redirect()
-        ->route('admin.products')
-        ->with('success', 'Selected products deleted successfully.');
-}
+        return redirect()
+            ->route('admin.products')
+            ->with('success', 'Selected products deleted successfully.');
+    }
+    public function orders(Request $request)
+    {
+        $query = Order::with('items')->latest();
+
+        // Search by order ID, customer name, or phone number
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('number', 'like', "%{$search}%");
+
+                if (is_numeric($search)) {
+                    $q->orWhere('id', $search);
+                }
+            });
+        }
+
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $orders = $query->paginate(10)->withQueryString();
+
+        return view('admin.orders', compact('orders'));
+    }
+
+    public function orderUpdateStatus(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'status' => [
+                'required',
+                'in:pending,confirmed,processing,shipped,delivered,cancelled',
+            ],
+        ]);
+
+        $order = Order::findOrFail($id);
+        $order->update([
+            'status' => $validated['status'],
+        ]);
+
+        return redirect()
+            ->route('admin.orders')
+            ->with('success', 'Order status updated successfully.');
+    }
 }
